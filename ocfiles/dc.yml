@@ -1,0 +1,106 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftNewApp
+  creationTimestamp: 2018-10-29T16:00:21Z
+  generation: 4
+  labels:
+    app: openshift-training
+  name: openshift-training
+  namespace: project12
+  resourceVersion: "35571085"
+  selfLink: /apis/apps.openshift.io/v1/namespaces/project12/deploymentconfigs/openshift-training
+  uid: bd57f935-db93-11e8-afbc-000d3a28cd6b
+spec:
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    app: openshift-training
+    deploymentconfig: openshift-training
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      annotations:
+        openshift.io/generated-by: OpenShiftNewApp
+      creationTimestamp: null
+      labels:
+        app: openshift-training
+        deploymentconfig: openshift-training
+    spec:
+      containers:
+      - image: docker-registry.default.svc:5000/project12/openshift-training@sha256:bea8b724758f259a1163dc3cffa52d88eb1b075c1fb9fb86875d380d19f1549e
+        imagePullPolicy: Always
+        name: openshift-training
+        ports:
+        - containerPort: 8443
+          protocol: TCP
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+          - name: "var-www"
+            mountPath: "/var/www"
+
+      volumes:
+        - name: "var-www"
+          persistentVolumeClaim:
+            claimName: "my-pvc"
+
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+  - type: ConfigChange
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - openshift-training
+      from:
+        kind: ImageStreamTag
+        name: openshift-training:latest
+        namespace: project12
+      lastTriggeredImage: docker-registry.default.svc:5000/project12/openshift-training@sha256:bea8b724758f259a1163dc3cffa52d88eb1b075c1fb9fb86875d380d19f1549e
+    type: ImageChange
+status:
+  availableReplicas: 2
+  conditions:
+  - lastTransitionTime: 2018-10-29T16:12:51Z
+    lastUpdateTime: 2018-10-29T16:12:53Z
+    message: replication controller "openshift-training-2" successfully rolled out
+    reason: NewReplicationControllerAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: 2018-10-30T04:09:07Z
+    lastUpdateTime: 2018-10-30T04:09:07Z
+    message: Deployment config has minimum availability.
+    status: "True"
+    type: Available
+  details:
+    causes:
+    - imageTrigger:
+        from:
+          kind: DockerImage
+          name: docker-registry.default.svc:5000/project12/openshift-training@sha256:bea8b724758f259a1163dc3cffa52d88eb1b075c1fb9fb86875d380d19f1549e
+      type: ImageChange
+    message: image change
+  latestVersion: 2
+  observedGeneration: 4
+  readyReplicas: 2
+  replicas: 2
+  unavailableReplicas: 0
+  updatedReplicas: 2

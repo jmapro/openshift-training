@@ -1,0 +1,33 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  creationTimestamp: null
+  name: My-Template
+objects:
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: openshift-training
+    name: openshift-training
+    namespace: project12
+  spec:
+    lookupPolicy:
+      local: false
+  status:
+    dockerImageRepository: docker-registry.default.svc:5000/project12/openshift-training
+    tags:
+    - items:
+      - created: 2018-10-29T16:12:40Z
+        dockerImageReference: docker-registry.default.svc:5000/project12/openshift-training@sha256:bea8b724758f259a1163dc3cffa52d88eb1b075c1fb9fb86875d380d19f1549e
+        generation: 1
+        image: sha256:bea8b724758f259a1163dc3cffa52d88eb1b075c1fb9fb86875d380d19f1549e
+      - created: 2018-10-29T16:01:07Z
+        dockerImageReference: docker-registry.default.svc:5000/project12/openshift-training@sha256:0227f512b9c6b6c94a5bf24257cbc5e9b3165b1b00ff8c1fd87d76ef46b82b44
+        generation: 1
+        image: sha256:0227f512b9c6b6c94a5bf24257cbc5e9b3165b1b00ff8c1fd87d76ef46b82b44
+      tag: latest

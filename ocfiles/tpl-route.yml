@@ -1,0 +1,17 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  creationTimestamp: null
+  labels:
+    app: openshift-training
+  name: training
+spec:
+  host: ""
+  port:
+    targetPort: 8080-tcp
+  to:
+    kind: ""
+    name: openshift-training
+    weight: null
+status:
+  ingress: null

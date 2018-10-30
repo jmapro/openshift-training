@@ -1,0 +1,138 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: training-template
+  annotations:
+    description: "training template"
+    tags: "database,nosql"
+labels:
+  app: front
+objects:
+  - apiVersion: build.openshift.io/v1
+    kind: BuildConfig
+    metadata:
+      labels:
+        app: ${app_name}
+      name: ${app_name}
+    spec:
+      nodeSelector: null
+      output:
+        to:
+          kind: ImageStreamTag
+          name: ${app_name}:latest
+      postCommit: {}
+      resources: {}
+      source:
+        git:
+          uri: https://github.com/jmapro/openshift-training.git
+        type: Git
+      strategy:
+        dockerStrategy:
+          from:
+            kind: ImageStreamTag
+            name: httpd:2.4
+            namespace: openshift
+        type: Docker
+      triggers:
+        - github:
+            secret: uo2Mdz4EgB0iisv_Ufk4
+            type: GitHub
+        - generic:
+            secret: z8zzCiH7Hun_p0vNXWjc
+            type: Generic
+        - type: ConfigChange
+        - imageChange: {}
+          type: ImageChange
+    status:
+      lastVersion: 0
+  - apiVersion: apps.openshift.io/v1
+    kind: DeploymentConfig
+    metadata:
+      labels:
+        app: ${app_name}
+      name: ${app_name}
+    spec:
+      replicas: 1
+      selector:
+        app: ${app_name}
+        deploymentconfig: ${app_name}
+      strategy:
+        resources: {}
+      template:
+        metadata:
+          labels:
+            app: ${app_name}
+            deploymentconfig: ${app_name}
+        spec:
+          containers:
+            - image: ${app_name}:latest
+              name: ${app_name}
+              ports:
+                - containerPort: 8080
+                  protocol: TCP
+                - containerPort: 8443
+                  protocol: TCP
+              resources: {}
+      test: false
+      triggers:
+        - type: ConfigChange
+        - imageChangeParams:
+            automatic: true
+            containerNames:
+              - ${app_name}
+            from:
+              kind: ImageStreamTag
+              name: ${app_name}:latest
+          type: ImageChange
+
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: ${app_name}
+      name: ${app_name}
+    spec:
+      ports:
+        - name: 8080-tcp
+          port: 8080
+          protocol: TCP
+          targetPort: 8080
+        - name: 8443-tcp
+          port: 8443
+          protocol: TCP
+          targetPort: 8443
+      selector:
+        app: ${app_name}
+        deploymentconfig: ${app_name}
+    status:
+      loadBalancer: {}
+  - apiVersion: image.openshift.io/v1
+    kind: ImageStream
+    metadata:
+      labels:
+        app: ${app_name}
+      name: ${app_name}
+    spec:
+      lookupPolicy:
+        local: false
+  - apiVersion: route.openshift.io/v1
+    kind: Route
+    metadata:
+      labels:
+        app: ${app_name}
+      name: ${app_name}
+    spec:
+      host: ${dns_name}
+      port:
+        targetPort: 8080-tcp
+      to:
+        kind: Service
+        name: ${app_name}
+        weight: 100
+  
+parameters:
+  - description: Application Name
+    name: app_name
+
+  - description: Dns Name
+    name: dns_name
